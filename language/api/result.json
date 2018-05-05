@@ -1,1 +1,0 @@
-{"requirements.txt": {"entities": [{"salience": 1, "mentions": [{"text": {"content": "google", "beginOffset": 0}, "type": "PROPER"}], "type": "ORGANIZATION", "name": "google", "metadata": {"mid": "/m/045c7b", "wikipedia_url": "https://en.wikipedia.org/wiki/Google"}}], "language": "en"}}

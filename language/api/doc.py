@@ -25,7 +25,7 @@ def analyze_entities(text, encoding='UTF32'):
         'encoding_type': encoding,
     }
     service = googleapiclient.discovery.build('language', 'v1')
-    request = service.documents().analyzeEntities(body=body)
+    request = service.documents().analyzeEntitySentiment(body=body)
     try:
         response = request.execute()
     except:
@@ -55,5 +55,17 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=150) as executor:
             print(counter)
             counter += 1
 
-with open('result22.json', 'w') as fp:
-    json.dump(data, fp)
+from itertools import islice
+
+def chunks(data, SIZE=100):
+    it = iter(data)
+    for i in range(0, len(data), SIZE):
+        yield {k:data[k] for k in islice(it, SIZE)}
+
+for i, chunk in enumerate(chunks(data)):
+    name = 'result' + str(i) + '.json'
+    with open(name, 'w') as fp:
+        json.dump(chunk, fp)
+
+
+
