@@ -50,7 +50,7 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=500) as executor:
         try:
             data[files[i]] = future.result()
         except Exception as exc:
-            print('%r generated an exception: %s' % (url, exc))
+            print('except')
         else:
             print(counter)
             counter += 1
