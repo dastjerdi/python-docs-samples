@@ -36,14 +36,14 @@ counter = 0
 results = {}
 os.chdir("texts")
 all_data = []
-files = glob.glob("*.txt")
+files = glob.glob("*.txt")[150:]
 for file in files:
 	with open(file, 'r') as myfile:
             data=myfile.read(999999).replace('\n', '')
             all_data += [data]
 
 data = {}
-with concurrent.futures.ThreadPoolExecutor(max_workers=300) as executor:
+with concurrent.futures.ThreadPoolExecutor(max_workers=150) as executor:
     future_to_url = {executor.submit(analyze_entities, url): url for url in all_data}
     for i, future in enumerate(concurrent.futures.as_completed(future_to_url)):
         url = future_to_url[future]
@@ -55,5 +55,5 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=300) as executor:
             print(counter)
             counter += 1
 
-with open('result.json', 'w') as fp:
+with open('result22.json', 'w') as fp:
     json.dump(data, fp)
