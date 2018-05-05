@@ -4,6 +4,8 @@ import sys
 import glob
 import googleapiclient.discovery
 import os
+import concurrent.futures
+import urllib.request
 
 
 def get_native_encoding_type():
@@ -25,18 +27,33 @@ def analyze_entities(text, encoding='UTF32'):
     }
     service = googleapiclient.discovery.build('language', 'v1')
     request = service.documents().analyzeEntities(body=body)
-    response = request.execute()
+    try:
+        response = request.execute()
+    except:
+        response = {}
     return response
 
 counter = 0
 results = {}
 os.chdir("texts")
-for file in glob.glob("*.txt"):
+all_data = []
+for file in glob.glob("*.txt")[:5]:
 	with open(file, 'r') as myfile:
             data=myfile.read(999999).replace('\n', '')
-	    results[file] = analyze_entities(data)
-	    counter += 1
-	    print(counter)
+            all_data += [data]
+# We can use a with statement to ensure threads are cleaned up promptly
+with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
+    # Start the load operations and mark each future with its URL
+    future_to_url = {executor.submit(analyze_entities, url): url for url in all_data}
+    for future in concurrent.futures.as_completed(future_to_url):
+        url = future_to_url[future]
+        try:
+            data = future.result()
+        except Exception as exc:
+            print('%r generated an exception: %s' % (url, exc))
+        else:
+            print(counter)
+            counter += 1	    
 
 with open('result.json', 'w') as fp:
-    json.dump(results, fp)
+    json.dump(future_to_url, fp)
